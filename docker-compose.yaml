@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    ports:
+      - 5050:5050
+      - 5051:5051
+    environment:
+      POSTGRES_HOST: postgres # match service name of postgres.
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: dogdata
+      POSTGRES_PASSWORD: dogdata
+      POSTGRES_DB: dogdata
+      GRPC_ADDR: 5050
+      GRPC_GATEWAY_ADDR: 5051
+      DD_SERVICE: dogdata
+    networks:
+      - default
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: dogdata
+      POSTGRES_PASSWORD: dogdata
+      POSTGRES_DB: dogdata
+    volumes:
+      - ./api/init.sql:/docker-entrypoint-initdb.d/init.sql

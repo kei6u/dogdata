@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package dogdatapb.v1;
+
+option go_package = "proto/v1/dogdatapb";
+
+import "google/api/annotations.proto";
+
+service DogDataService {
+  // Create creates new DogData.
+  rpc Create(CreateRequest) returns (CreateResponse) {
+    option (google.api.http) = {
+      post : "/v1/dogdata"
+      body : "*"
+    };
+  }
+  // Create gets the DogData associated by id.
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+      get : "/v1/dogdata/{id}"
+    };
+  }
+  // Create lists all DogData.
+  rpc List(ListRequest) returns (ListResponse) {
+    option (google.api.http) = {
+      get : "/v1/dogdata"
+    };
+  }
+  // Update updates the DogData associated by id. If a filed value is null, ignores it.
+  rpc Update(UpdateRequest) returns (UpdateResponse) {
+    option (google.api.http) = {
+      put : "/v1/dogdata"
+      body : "*"
+    };
+  }
+  // Create deletes the DogData associated by id.
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete : "/v1/dogdata/{id}"
+    };
+  }
+}
+
+message CreateRequest {
+	string name = 1;
+	string breed = 2;
+}
+message CreateResponse {
+	int32 id = 1;
+}
+
+message GetRequest {
+	int32 id = 1;
+}
+message GetResponse {
+	DogData dogdata = 1;
+}
+
+message ListRequest {}
+message ListResponse {
+	repeated DogData dogdata = 1;
+}
+
+message UpdateRequest {
+	int32 id = 1;
+	string name = 2;
+}
+message UpdateResponse {
+	DogData dogdata = 1;
+}
+
+message DeleteRequest {
+	int32 id = 1;
+}
+message DeleteResponse { }
+
+message DogData {
+	int32 id = 1;
+	string name = 2;
+	string breed = 3;
+}

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package healthcheckpb.v1;
+
+option go_package = "proto/v1/healthcheckpb";
+
+import "google/api/annotations.proto";
+
+service HealthCheckService {
+  rpc LivenessProbe (LivenessProbeRequest) returns (LivenessProbeResponse) {
+    option (google.api.http) = {
+      get: "/v1/healthcheck/livenessProbe"
+    };
+  };
+  rpc ReadinessProbe (ReadinessProbeRequest) returns (ReadinessProbeResponse) {
+    option (google.api.http) = {
+      get: "/v1/healthcheck/readinessProbe"
+    };
+  };
+  rpc StartupProbe (StartupProbeRequest) returns (StartupProbeResponse) {
+    option (google.api.http) = {
+      get: "/v1/healthcheck/startupProbe"
+    };
+  };
+}
+
+message LivenessProbeRequest {}
+message LivenessProbeResponse {}
+
+message ReadinessProbeRequest {}
+message ReadinessProbeResponse {}
+
+message StartupProbeRequest {}
+message StartupProbeResponse {}
