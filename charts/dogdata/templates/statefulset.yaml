@@ -20,14 +20,21 @@ spec:
     spec:
       containers:
         - env:
-            - name: POSTGRES_USER
-              value: {{ .Values.postgresConfig.user }}
-            - name: POSTGRES_PASSWORD
-              value: {{ .Values.postgresConfig.password }}
-            - name: POSTGRES_DB
-              value: {{ .Values.postgresConfig.db }}
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
+          - name: POSTGRES_USER
+            value: {{ .Values.postgresConfig.user }}
+          - name: POSTGRES_PASSWORD
+            value: {{ .Values.postgresConfig.password }}
+          - name: POSTGRES_DB
+            value: {{ .Values.postgresConfig.db }}
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+          - name: POSTGRES_INITDB_ARGS
+            value: --auth-host=scram-sha-256
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
           image: postgres
           imagePullPolicy: IfNotPresent
           name: {{ include "dogdataPostgres.fullname" . }}
@@ -36,10 +43,33 @@ spec:
               protocol: TCP
           resources: null
           volumeMounts:
-            - mountPath: /docker-entrypoint-initdb.d
-              name: psql-initialization-sql
+            - mountPath: /docker-entrypoint-initdb.d/init.sql
+              name: init-sql
+              subPath: init.sql
             - mountPath: /var/lib/postgresql/data
               name: postgres
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - exec pg_isready --host $POD_IP
+            failureThreshold: 6
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - exec pg_isready --host $POD_IP
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
       volumes:
         - configMap:
             items:
@@ -47,8 +77,6 @@ spec:
                 path: init.sql
             name: {{ include "dogdataPostgres.fullname" . }}
           name: init-sql
-        - emptyDir: {}
-          name: psql-initialization-sql
         - name: postgres
           persistentVolumeClaim:
             claimName: {{ include "dogdataPostgres.fullname" . }}

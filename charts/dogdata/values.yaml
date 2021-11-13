@@ -48,8 +48,8 @@ resources:
     memory: 128Mi
 
 ports:
-  grpc: 5050
-  grpcGateway: 5051
+  grpc: 50050
+  grpcGateway: 50051
 
 env: []
   # - name: DD_ENV
@@ -58,7 +58,7 @@ env: []
 # Configure for Postgres which will be deployed in same namespace
 # and run as a StatefulSet
 postgresConfig:
-  host: localhost
+  host: dogdata-postgres
   port: 5432
   user: dogdata
   password: dogdata

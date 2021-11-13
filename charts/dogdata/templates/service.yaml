@@ -8,9 +8,13 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.ports.grpcGateway }}
+      targetPort: grpc-gateway
       protocol: TCP
-      name: http
+      name: grpc-gateway
+    - port: {{ .Values.ports.grpc }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
   selector:
     {{- include "dogdata.selectorLabels" . | nindent 4 }}
