@@ -3,6 +3,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "dogdata.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "dogdata.labels" . | nindent 4 }}
 spec:

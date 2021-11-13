@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "dogdata.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "dogdata.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "dogdata.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "dogdata.fullname" . }}
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "dogdata.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresConfig.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgresConfig.password }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresConfig.db }}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          image: postgres
+          imagePullPolicy: IfNotPresent
+          name: {{ include "dogdata.fullname" . }}
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          resources: null
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: psql-initialization-sql
+            - mountPath: /var/lib/postgresql/data
+              name: postgres
+      volumes:
+        - configMap:
+            items:
+              - key: init.sql
+                path: init.sql
+            name: {{ include "dogdata.fullname" . }}
+          name: init-sql
+        - emptyDir: {}
+          name: psql-initialization-sql
+        - name: postgres
+          persistentVolumeClaim:
+            claimName: {{ include "dogdata.fullname" . }}

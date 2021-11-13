@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "dogdata.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "dogdata.labels" . | nindent 4 }}
 spec:
@@ -34,17 +35,44 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: grpc
+              containerPort: {{ .Values.ports.grpc }}
+              protocol: TCP
+            - name: grpc-gateway
+              containerPort: {{ .Values.ports.grpcGateway }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /v1/healthcheck/livenessProbe
+              port: grpc-gateway
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /v1/healthcheck/readinessProbe
+              port: grpc-gateway
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.postgresConfig.host }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.postgresConfig.port }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresConfig.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgresConfig.password }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresConfig.db }}
+            - name: GRPC_ADDR
+              value: {{ .Values.ports.grpc }}
+            - name: GRPC_GATEWAY_ADDR
+              value: {{ .Values.ports.grpcGateway }}
+            - name: DD_SERVICE
+              value: dogdata
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          {{- with .Values.env }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

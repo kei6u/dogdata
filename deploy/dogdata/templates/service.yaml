@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "dogdata.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "dogdata.labels" . | nindent 4 }}
 spec:
