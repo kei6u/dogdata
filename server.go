@@ -163,7 +163,7 @@ func (s *server) Create(ctx context.Context, req *dogdatapb.CreateRequest) (*dog
 		req.GetName(), req.GetBreed(),
 	).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, status.Errorf(codes.Internal, "failed to verfiy if requested data already exists: %s", err)
+		return nil, status.Errorf(codes.Internal, "failed to validate the existence of requested data: %s", err)
 	}
 	if name != "" {
 		return nil, status.Errorf(codes.AlreadyExists, "%s is already existed", name)
@@ -248,7 +248,7 @@ func (s *server) Update(ctx context.Context, req *dogdatapb.UpdateRequest) (*dog
 		existed.GetDogdata().GetName(), existed.GetDogdata().GetBreed(),
 	).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
-		return nil, status.Errorf(codes.Internal, "failed to verfiy if requested data already exists: %s", err)
+		return nil, status.Errorf(codes.Internal, "failed to validate the existence of requested data: %s", err)
 	}
 	if name != "" {
 		return nil, status.Errorf(codes.AlreadyExists, "%s is already existed", name)
