@@ -4,16 +4,16 @@ services:
     build:
       context: .
     ports:
-      - 5050:5050
-      - 5051:5051
+      - 50050:50050
+      - 50051:50051
     environment:
       POSTGRES_HOST: postgres # match service name of postgres.
       POSTGRES_PORT: 5432
       POSTGRES_USER: dogdata
       POSTGRES_PASSWORD: dogdata
       POSTGRES_DB: dogdata
-      GRPC_ADDR: 5050
-      GRPC_GATEWAY_ADDR: 5051
+      GRPC_ADDR: 50050
+      GRPC_GATEWAY_ADDR: 50051
       DD_SERVICE: dogdata
     networks:
       - default
@@ -30,4 +30,4 @@ services:
       POSTGRES_PASSWORD: dogdata
       POSTGRES_DB: dogdata
     volumes:
-      - ./api/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
