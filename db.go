@@ -42,7 +42,7 @@ func newDB() (db *sql.DB, close func() error, err error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to open postgres by %s: %w", dsn, err)
 	}
-	if err := db.Ping(); err != nil {
+	if err := ping(db); err != nil {
 		return nil, nil, fmt.Errorf("failed to ping postgres: %w", err)
 	}
 	return db, db.Close, nil
