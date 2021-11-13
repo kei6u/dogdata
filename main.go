@@ -46,13 +46,7 @@ func main() {
 	}()
 
 	go func() {
-		s := newServer(
-			os.Getenv("GRPC_ADDR"),
-			os.Getenv("GRPC_GATEWAY_ADDR"),
-			logger,
-			db,
-		)
-		s.Start(ctx)
+		newServer(os.Getenv("GRPC_ADDR"), os.Getenv("GRPC_GATEWAY_ADDR"), logger, db).Start(ctx)
 	}()
 
 	<-ctx.Done()
