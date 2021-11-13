@@ -1,14 +1,14 @@
 FROM golang:1.17 as builder
 
 WORKDIR /workspace
-COPY /api/go.mod go.mod
-COPY /api/go.sum go.sum
+COPY go.mod go.mod
+COPY go.sum go.sum
 RUN go mod download
 
-COPY /api/main.go main.go
-COPY /api/db.go db.go
-COPY /api/server.go server.go
-COPY /api/proto proto
+COPY main.go main.go
+COPY db.go db.go
+COPY server.go server.go
+COPY proto proto
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o app *.go
 
