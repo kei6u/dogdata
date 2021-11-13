@@ -45,10 +45,18 @@ spec:
             httpGet:
               path: /v1/healthcheck/livenessProbe
               port: grpc-gateway
+            failureThreshold: 1
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /v1/healthcheck/readinessProbe
               port: grpc-gateway
+          startupProbe:
+            httpGet:
+              path: /v1/healthcheck/startupProbe
+              port: grpc-gateway
+            failureThreshold: 30
+            periodSeconds: 10
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgresConfig.host }}
