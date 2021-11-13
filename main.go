@@ -15,7 +15,6 @@ func main() {
 	defer logger.Sync()
 
 	if err := profiler.Start(
-		profiler.WithService(os.Getenv("DD_SERVICE")),
 		profiler.WithProfileTypes(
 			profiler.CPUProfile,
 			profiler.HeapProfile,
