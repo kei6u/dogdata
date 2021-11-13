@@ -18,9 +18,11 @@ import (
 	dogdatapb "github.com/kei6u/dogdata/proto/v1/dogdata"
 	healthcheckpb "github.com/kei6u/dogdata/proto/v1/healthcheck"
 	_ "github.com/lib/pq"
+	"github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -101,6 +103,11 @@ func (s *server) Start(ctx context.Context) {
 					grpc_zap.WithDecider(func(fullMethodName string, _ error) bool {
 						return !strings.Contains(fullMethodName, "healthcheck")
 					}),
+					grpc_zap.WithMessageProducer(func(ctx context.Context, msg string, level zapcore.Level, code codes.Code, err error, duration zapcore.Field) {
+						// inject trace ID into logs
+						grpc_zap.AddFields(ctx, zap.Any("span", opentracing.SpanFromContext(ctx)))
+						grpc_zap.DefaultMessageProducer(ctx, msg, level, code, err, duration)
+					}),
 				),
 			),
 		)
@@ -156,12 +163,16 @@ func (s *server) Start(ctx context.Context) {
 
 func (s *server) Create(ctx context.Context, req *dogdatapb.CreateRequest) (*dogdatapb.CreateResponse, error) {
 	// Validating duplicated data.
-	var name string
-	err := s.db.QueryRowContext(
+	row := s.db.QueryRowContext(
 		ctx,
 		"SELECT name FROM dogdata WHERE name=$1 AND breed=$2",
 		req.GetName(), req.GetBreed(),
-	).Scan(&name)
+	)
+	if row == nil {
+		return nil, status.Error(codes.Internal, "failed to validate the existence of requested data")
+	}
+	var name string
+	err := row.Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, status.Errorf(codes.Internal, "failed to validate the existence of requested data: %s", err)
 	}
