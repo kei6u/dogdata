@@ -9,5 +9,5 @@ data:
     );
 kind: ConfigMap
 metadata:
-  name: {{ include "dogdata.fullname" . }}
+  name: {{ include "dogdataPostgres.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}

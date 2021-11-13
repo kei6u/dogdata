@@ -60,3 +60,30 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create a default fuuly qualified postgres name.
+*/}}
+{{- define "dogdataPostgres.fullname" -}}
+{{- printf "%s-postgres" .Chart.Name | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Common labels for postgres
+*/}}
+{{- define "dogdataPostgres.labels" -}}
+helm.sh/chart: {{ include "dogdata.chart" . }}
+{{ include "dogdataPostgres.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels for postgres
+*/}}
+{{- define "dogdataPostgres.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "dogdata.name" . }}-postgres
+app.kubernetes.io/instance: {{ .Release.Name }}-postgres
+{{- end }}
