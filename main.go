@@ -28,8 +28,7 @@ func main() {
 
 	db, closeDB, err := newDB()
 	if err != nil {
-		logger.Warn("failed to connect to database", zap.Error(err))
-		logger.Warn("exit the process....")
+		logger.Warn("exit due to connection failure of database", zap.Error(err))
 		return
 	}
 	defer closeDB()
