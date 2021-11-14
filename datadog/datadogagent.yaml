@@ -1,0 +1,53 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogAgent
+metadata:
+  name: datadog
+  namespace: datadog
+spec:
+  credentials:
+    apiSecret:
+      keyName: api-key
+      secretName: datadog-credentials
+    appSecret:
+      keyName: app-key
+      secretName: datadog-credentials
+  features:
+    kubeStateMetricsCore:
+      enabled: true
+  agent:
+    image:
+      name: gcr.io/datadoghq/agent:7.32.0
+    apm:
+      enabled: true
+    process:
+      enabled: true
+      processCollectionEnabled: true
+    log:
+      enabled: true
+      logsConfigContainerCollectAll: true
+      containerCollectUsingFiles: true
+    systemProbe:
+      bpfDebugEnabled: false
+    security:
+      compliance:
+        enabled: true
+      runtime:
+        enabled: false
+    config:
+      collectEvents: true
+      resources:
+        requests:
+          cpu: 200m
+          memory: 300Mi
+        limits:
+          cpu: 200m
+          memory: 600Mi
+  clusterAgent:
+    image:
+      name: gcr.io/datadoghq/cluster-agent:1.16.0
+    config:
+      externalMetrics:
+        enabled: true
+      admissionController:
+        enabled: true
+      clusterChecksEnabled: true
