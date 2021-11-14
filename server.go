@@ -107,8 +107,8 @@ func (s *server) Start(ctx context.Context) {
 						if dds, ok := tracer.SpanFromContext(ctx); ok {
 							grpc_zap.AddFields(
 								ctx,
-								zap.Uint64("trace_id", dds.Context().TraceID()),
-								zap.Uint64("span_id", dds.Context().SpanID()),
+								zap.Uint64("dd.trace_id", dds.Context().TraceID()),
+								zap.Uint64("dd.span_id", dds.Context().SpanID()),
 							)
 						}
 						grpc_zap.DefaultMessageProducer(ctx, msg, level, code, err, duration)
