@@ -15,7 +15,25 @@ spec:
   template:
     metadata:
       annotations:
-        ad.datadoghq.com/dogdata.logs: '[{"source":"go","service":"dogdata"}]'
+        ad.datadoghq.com/{{ .Chart.Name }}.logs: '[{"source":"go","service":{{ .Chart.Name | quote }}}]'
+        ad.datadoghq.com/{{ .Chart.Name }}.check_names: |
+          ["openmetrics"]
+        ad.datadoghq.com/{{ .Chart.Name }}.init_configs: |
+          [{}]
+        ad.datadoghq.com/{{ .Chart.Name }}.instances: |
+            [
+              {
+                "prometheus_url": "http://%%host%%:9092/metrics",
+                "namespace": {{ .Release.Namespace | quote }},
+                "metrics": [
+                  {"grpc_server_started_total":"grpc_server_started_total"},
+                  {"grpc_server_handled_total":"grpc_server_handled_total"},
+                  {"grpc_server_msg_received_total":"grpc_server_msg_received_total"},
+                  {"grpc_server_msg_sent_total":"grpc_server_msg_sent_total"},
+                  {"grpc_server_handling_seconds":"grpc_server_handling_seconds"}
+                ]
+              }
+            ]
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
