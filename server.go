@@ -18,7 +18,6 @@ import (
 	dogdatapb "github.com/kei6u/dogdata/proto/v1/dogdata"
 	healthcheckpb "github.com/kei6u/dogdata/proto/v1/healthcheck"
 	_ "github.com/lib/pq"
-	"github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
@@ -105,7 +104,13 @@ func (s *server) Start(ctx context.Context) {
 					}),
 					grpc_zap.WithMessageProducer(func(ctx context.Context, msg string, level zapcore.Level, code codes.Code, err error, duration zapcore.Field) {
 						// inject trace ID into logs
-						grpc_zap.AddFields(ctx, zap.Any("span", opentracing.SpanFromContext(ctx)))
+						if dds, ok := tracer.SpanFromContext(ctx); ok {
+							grpc_zap.AddFields(
+								ctx,
+								zap.Uint64("trace_id", dds.Context().TraceID()),
+								zap.Uint64("span_id", dds.Context().SpanID()),
+							)
+						}
 						grpc_zap.DefaultMessageProducer(ctx, msg, level, code, err, duration)
 					}),
 				),
