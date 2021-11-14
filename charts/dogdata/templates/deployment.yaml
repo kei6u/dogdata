@@ -14,8 +14,9 @@ spec:
       {{- include "dogdata.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        ad.datadoghq.com/dogdata.logs: '[{"source":"go","service":"dogdata"}]'
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -74,6 +75,8 @@ spec:
             value: {{ .Values.ports.grpcGateway | quote }}
           - name: DD_SERVICE
             value: dogdata
+          - name: DD_VERSION
+            value: 0.1.0-rc.3
           - name: DD_AGENT_HOST
             valueFrom:
               fieldRef:
