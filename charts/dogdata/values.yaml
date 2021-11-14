@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/kei6u/dogdata
   pullPolicy: IfNotPresent
-  tag: 0.1.0-rc.4
+  tag: 0.1.0-rc.5
 
 imagePullSecrets: []
 nameOverride: ""
