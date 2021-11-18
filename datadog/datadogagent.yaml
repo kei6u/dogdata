@@ -14,6 +14,8 @@ spec:
   features:
     kubeStateMetricsCore:
       enabled: true
+    networkMonitoring:
+      enabled: true
   agent:
     image:
       name: gcr.io/datadoghq/agent:7.32.0
@@ -28,6 +30,7 @@ spec:
       containerCollectUsingFiles: true
     systemProbe:
       bpfDebugEnabled: false
+      enabled: true
     security:
       compliance:
         enabled: true

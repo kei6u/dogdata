@@ -104,6 +104,12 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: sysprobe-socket-dir
+          emptyDir: {}
+        - name: debugfs
+          hostPath:
+            path: /sys/kernel/debug
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
